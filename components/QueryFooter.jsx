@@ -216,7 +216,7 @@ const QueryFooter = () => {
                           name={name}
                           required={required}
                           placeholder={placeholder}
-                          className="w-full bg-transparent border-none p-0 focus:ring-0 
+                          className="w-full bg-transparent border-none p-0 focus:outline-none focus:ring-0 
                                    placeholder-zinc-600 text-zinc-200"
                         />
                       </div>
@@ -239,7 +239,7 @@ const QueryFooter = () => {
                       required
                       rows={4}
                       placeholder="Please describe your issue or question in detail..."
-                      className="w-full bg-transparent border-none p-0 focus:ring-0 
+                      className="w-full bg-transparent border-none p-0 focus:outline-none focus:ring-0 
                                text-zinc-200 placeholder-zinc-600 resize-none"
                     />
                   </div>
