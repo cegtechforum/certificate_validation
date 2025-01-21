@@ -353,7 +353,7 @@ const NewUserModal = ({ isOpen, closeModal }) => {
                                          border border-emerald-500/30"
                               >
                                 <Upload size={20} />
-                                <span>Upload Image</span>
+                                <span>Upload QR Image</span>
                               </button>
                             </div>
                             

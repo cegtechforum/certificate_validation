@@ -326,7 +326,7 @@ const User = () => {
                 onClick: handleButtonClickForScanner,
               },
               {
-                label: "Upload Image",
+                label: "Upload QR Image",
                 icon: Upload,
                 onClick: handleButtonClickForImageUpload,
               },
