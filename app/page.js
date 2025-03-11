@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useState, useEffect } from "react";
 import QRImageReader from "../components/QRImageReader";
 import { toast } from "react-toastify";
@@ -16,11 +16,11 @@ const User = () => {
   const [open, setOpen] = useState(false);
   const [scannerVisible, setScannerVisible] = useState(false);
   //const [imageUploadVisible, setImageUploadVisible] = useState(false);
-  const [fetchData,setFetchData] = useState(null);
+  const [fetchData, setFetchData] = useState(null);
   const [validating, setValidating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [model,setModel] = useState(true);
-  
+  const [model, setModel] = useState(true);
+
   // Reset states when modal is closed
   const handleClose = () => {
     setOpen(false);
@@ -38,11 +38,14 @@ const User = () => {
     setIsLoading(true);
     try {
       await simulateValidation();
-      
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/fetchQrDetails?unique_id=${uniqueId}`, {
-        method: "GET",
-      });
+      const response = await fetch(
+        `${apiUrl}/fetchQrDetails?unique_id=${uniqueId}`,
+        {
+          method: "GET",
+        }
+      );
 
       if (!response.ok) {
         toast.error("Failed to validate certificate");
@@ -60,7 +63,7 @@ const User = () => {
         setModel(false);
         return false;
       }
-      
+
       setFetchData(responseData);
       setQrCodeData(uniqueId);
       return true;
@@ -76,10 +79,10 @@ const User = () => {
   // Check URL parameters on component mount
   useEffect(() => {
     const checkUrlParameters = async () => {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const urlParams = new URLSearchParams(window.location.search);
-        const uniqueId = urlParams.get('unique_id');
-        
+        const uniqueId = urlParams.get("unique_id");
+
         if (uniqueId) {
           const success = await fetchCertificateDetails(uniqueId);
           if (success) {
@@ -88,16 +91,16 @@ const User = () => {
               bodyClassName: "custom-toast-body",
               progressClassName: "custom-progress-bar",
               toastId: "url-success",
-              autoClose: 2000
+              autoClose: 2000,
             });
             handleOpen();
           }
         }
       }
     };
-    
+
     checkUrlParameters();
-    
+
     // Clean up function to reset states
     return () => {
       setOpen(false);
@@ -119,7 +122,7 @@ const User = () => {
     //setImageUploadVisible(true);
     setScannerVisible(false);
   };
-  
+
   const simulateValidation = async () => {
     return new Promise((resolve) => {
       setTimeout(resolve, 1500); // Simulate network delay
@@ -135,12 +138,12 @@ const User = () => {
 
       if (data !== "Wrong Input" && data !== qrCodeData) {
         setScannerVisible(false); // First stop the scanner
-        
+
         // Update URL with query parameter
         const currentUrl = window.location.origin + window.location.pathname;
         const newUrl = `${currentUrl}?unique_id=${data}`;
-        window.history.pushState({}, '', newUrl);
-        
+        window.history.pushState({}, "", newUrl);
+
         const success = await fetchCertificateDetails(data);
         if (success) {
           // Use setTimeout to ensure state updates have propagated
@@ -150,7 +153,7 @@ const User = () => {
               bodyClassName: "custom-toast-body",
               progressClassName: "custom-progress-bar",
               toastId: "scanner-success",
-              autoClose: 2000
+              autoClose: 2000,
             });
             handleOpen();
           }, 100);
@@ -181,8 +184,8 @@ const User = () => {
         // Update URL with query parameter
         const currentUrl = window.location.origin + window.location.pathname;
         const newUrl = `${currentUrl}?unique_id=${data}`;
-        window.history.pushState({}, '', newUrl);
-        
+        window.history.pushState({}, "", newUrl);
+
         const success = await fetchCertificateDetails(data);
         if (success) {
           toast.success(`Certificate Validated Successfully`, {
@@ -190,7 +193,7 @@ const User = () => {
             bodyClassName: "custom-toast-body",
             progressClassName: "custom-progress-bar",
             toastId: "upload-success",
-            autoClose: 1500
+            autoClose: 1500,
           });
           handleOpen();
         }
@@ -220,12 +223,12 @@ const User = () => {
     } else {
       try {
         setValidating(true);
-        
+
         // Update URL with query parameter
         const currentUrl = window.location.origin + window.location.pathname;
         const newUrl = `${currentUrl}?unique_id=${textInput}`;
-        window.history.pushState({}, '', newUrl);
-        
+        window.history.pushState({}, "", newUrl);
+
         const success = await fetchCertificateDetails(textInput);
         if (success) {
           toast.success(`Validated ID: ${textInput}`, {
@@ -233,7 +236,7 @@ const User = () => {
             bodyClassName: "custom-toast-body",
             progressClassName: "custom-progress-bar",
             toastId: "validate-success",
-            autoClose: 1500
+            autoClose: 1500,
           });
           handleOpen();
           setTextInput("");
@@ -243,13 +246,13 @@ const User = () => {
       }
     }
   };
-  
+
   return (
     <div className="relative min-h-screen bg-custom-background">
       {/* Company Header - Fixed Position */}
 
       <div
-        className="absolute top-0 right-0 z-10 p-4 md:p-5 flex items-center gap-3 cursor-pointer"
+        className="absolute top-0 right-0 z-1 p-4 md:p-5 flex items-center gap-1 cursor-pointer"
         onClick={() => (window.location.href = "https://cegtechforum.in/")}
       >
         <img
@@ -261,7 +264,6 @@ const User = () => {
           CEG Tech Forum
         </h1>
       </div>
-
 
       {/* Main Content */}
       <div
@@ -284,7 +286,9 @@ const User = () => {
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
               <div className="bg-zinc-900 p-6 rounded-lg shadow-xl flex items-center space-x-4">
                 <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-                <span className="text-lg text-white font-bold">Checking the status of your Certificate...</span>
+                <span className="text-lg text-white font-bold">
+                  Checking the status of your Certificate...
+                </span>
               </div>
             </div>
           )}
@@ -371,19 +375,22 @@ const User = () => {
               </Link>
             </h1>
           </div>
-            
+
           {/* Display Modal only if QR Code data is generated */}
-          {qrCodeData && qrCodeData !== "" && qrCodeData !== "Wrong Input"  && model &&  (
-            <CustomModal
-              open={open}
-              handleClose={handleClose}
-              // Add these props if your CustomModal accepts them
-              onClose={handleClose}
-              closeOnOverlayClick={true}
-              closeOnEsc={true}
-              fetchData={fetchData}
-            />
-          )}
+          {qrCodeData &&
+            qrCodeData !== "" &&
+            qrCodeData !== "Wrong Input" &&
+            model && (
+              <CustomModal
+                open={open}
+                handleClose={handleClose}
+                // Add these props if your CustomModal accepts them
+                onClose={handleClose}
+                closeOnOverlayClick={true}
+                closeOnEsc={true}
+                fetchData={fetchData}
+              />
+            )}
         </div>
       </div>
       <QueryFooter />
