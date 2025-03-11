@@ -20,6 +20,7 @@ const User = () => {
   const [validating, setValidating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [model,setModel] = useState(true);
+  
   // Reset states when modal is closed
   const handleClose = () => {
     setOpen(false);
@@ -32,8 +33,72 @@ const User = () => {
     setOpen(true);
   };
 
-  // Clean up function to reset states
+  // Function to fetch certificate details
+  const fetchCertificateDetails = async (uniqueId) => {
+    setIsLoading(true);
+    try {
+      await simulateValidation();
+      
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${apiUrl}/fetchQrDetails?unique_id=${uniqueId}`, {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        toast.error("Failed to validate certificate");
+        return false;
+      }
+
+      const responseData = await response.json();
+      if (responseData.validation_status === "pending") {
+        router.push("/requestPending");
+        setModel(false);
+        return false;
+      }
+      if (responseData.validation_status === "unlisted") {
+        router.push("/notFound");
+        setModel(false);
+        return false;
+      }
+      
+      setFetchData(responseData);
+      setQrCodeData(uniqueId);
+      return true;
+    } catch (error) {
+      console.error("Error fetching certificate details:", error);
+      toast.error("An error occurred while validating the certificate");
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Check URL parameters on component mount
   useEffect(() => {
+    const checkUrlParameters = async () => {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const uniqueId = urlParams.get('unique_id');
+        
+        if (uniqueId) {
+          const success = await fetchCertificateDetails(uniqueId);
+          if (success) {
+            toast.success(`Certificate Validated Successfully`, {
+              className: "toast-success-custom",
+              bodyClassName: "custom-toast-body",
+              progressClassName: "custom-progress-bar",
+              toastId: "url-success",
+              autoClose: 2000
+            });
+            handleOpen();
+          }
+        }
+      }
+    };
+    
+    checkUrlParameters();
+    
+    // Clean up function to reset states
     return () => {
       setOpen(false);
       setScannerVisible(false);
@@ -54,6 +119,7 @@ const User = () => {
     //setImageUploadVisible(true);
     setScannerVisible(false);
   };
+  
   const simulateValidation = async () => {
     return new Promise((resolve) => {
       setTimeout(resolve, 1500); // Simulate network delay
@@ -64,47 +130,32 @@ const User = () => {
     // Immediately stop if scanner isn't visible
     if (!scannerVisible) return;
     setIsLoading(true);
-    try{
+    try {
       await simulateValidation();
 
       if (data !== "Wrong Input" && data !== qrCodeData) {
         setScannerVisible(false); // First stop the scanner
-        setQrCodeData(data); // Then set the data
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        const response = await fetch(`${apiUrl}/fetchQrDetails?unique_id=${data}`, {
-          method: "GET",
-        });
-  
-        if (!response.ok) {
-          toast.error("Failed to validate certificate");
-          return;
+        
+        // Update URL with query parameter
+        const currentUrl = window.location.origin + window.location.pathname;
+        const newUrl = `${currentUrl}?unique_id=${data}`;
+        window.history.pushState({}, '', newUrl);
+        
+        const success = await fetchCertificateDetails(data);
+        if (success) {
+          // Use setTimeout to ensure state updates have propagated
+          setTimeout(() => {
+            toast.success(`Certificate Validated Successfully`, {
+              className: "toast-success-custom",
+              bodyClassName: "custom-toast-body",
+              progressClassName: "custom-progress-bar",
+              toastId: "scanner-success",
+              autoClose: 2000
+            });
+            handleOpen();
+          }, 100);
         }
-  
-        const responseData = await response.json();
-        if(responseData.validation_status==="pending"){
-          router.push("/requestPending");
-          setModel(false);
-          return;
-        }
-        if(responseData.validation_status==="unlisted"){
-          router.push("/notFound");
-          setModel(false);
-          return;
-        }
-        setFetchData(responseData);
-        // Use setTimeout to ensure state updates have propagated
-        setTimeout(() => {
-          toast.success(`Certificate Validated Successfully`, {
-            className: "toast-success-custom",
-            bodyClassName: "custom-toast-body",
-            progressClassName: "custom-progress-bar",
-            toastId: "scanner-success",
-            autoClose : 2000
-          });
-          handleOpen();
-        }, 100);
-      }
-       else if (data === "Wrong Input") {
+      } else if (data === "Wrong Input") {
         toast.error("Invalid QR Code", {
           className: "toast-error-custom",
           position: toast.POSITION.TOP_CENTER,
@@ -117,67 +168,47 @@ const User = () => {
           toastId: "scanner-error",
         });
       }
-    }
-    finally{
+    } finally {
       setIsLoading(false);
     }
-
   };
 
   const handleQRCodeData = async (data) => {
     setIsLoading(true);
-   try{
-    await simulateValidation();
-    if (data !== "Wrong Input") {
-      setQrCodeData(data);
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/fetchQrDetails?unique_id=${data}`, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        toast.error("Failed to validate certificate");
-        return;
+    try {
+      await simulateValidation();
+      if (data !== "Wrong Input") {
+        // Update URL with query parameter
+        const currentUrl = window.location.origin + window.location.pathname;
+        const newUrl = `${currentUrl}?unique_id=${data}`;
+        window.history.pushState({}, '', newUrl);
+        
+        const success = await fetchCertificateDetails(data);
+        if (success) {
+          toast.success(`Certificate Validated Successfully`, {
+            className: "toast-success-custom",
+            bodyClassName: "custom-toast-body",
+            progressClassName: "custom-progress-bar",
+            toastId: "upload-success",
+            autoClose: 1500
+          });
+          handleOpen();
+        }
+      } else {
+        toast.error("Invalid QR Code", {
+          className: "toast-error-custom",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          toastId: "upload-error",
+        });
       }
-
-      const responseData = await response.json();
-      if(responseData.validation_status==="pending"){
-        router.push("/requestPending");
-        setModel(false);
-        return;
-      }
-      if(responseData.validation_status==="unlisted"){
-        router.push("/notFound");
-        setModel(false);
-        return;
-      }
-      setFetchData(responseData);
-      
-      toast.success(`Certificate Validated Successfully`, {
-        className: "toast-success-custom",
-        bodyClassName: "custom-toast-body",
-        progressClassName: "custom-progress-bar",
-        toastId: "upload-success",
-        autoClose : 1500
-      });
-      handleOpen();
-    } else {
-      toast.error("Invalid QR Code", {
-        className: "toast-error-custom",
-
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        toastId: "upload-error",
-      });
+    } finally {
+      setIsLoading(false);
     }
-   }
-   finally{
-    setIsLoading(false);
-   }
   };
 
   const handleValidate = async () => {
@@ -186,53 +217,33 @@ const User = () => {
         className: "toast-error-custom",
         toastId: "validate-error",
       });
-    }
-    else{
-      try{
+    } else {
+      try {
+        setValidating(true);
         
-          setValidating(true);
-          setQrCodeData(textInput);
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-          const response = await fetch(`${apiUrl}/fetchQrDetails?unique_id=${textInput}`, {
-            method: "GET",
-          });
-    
-          if (!response.ok) {
-            toast.error("Failed to check the status of certificate");
-            return;
-          }
-    
-          const responseData = await response.json();
-          if(responseData.validation_status==="pending"){
-            router.push("/requestPending");
-            setModel(false);
-            return;
-          }
-           if(responseData.validation_status==="unlisted"){
-            router.push("/notFound");
-            setModel(false);
-            return;
-          }
-          setFetchData(responseData);
-          
+        // Update URL with query parameter
+        const currentUrl = window.location.origin + window.location.pathname;
+        const newUrl = `${currentUrl}?unique_id=${textInput}`;
+        window.history.pushState({}, '', newUrl);
+        
+        const success = await fetchCertificateDetails(textInput);
+        if (success) {
           toast.success(`Validated ID: ${textInput}`, {
             className: "toast-success-custom",
             bodyClassName: "custom-toast-body",
             progressClassName: "custom-progress-bar",
             toastId: "validate-success",
-            autoClose : 1500
+            autoClose: 1500
           });
           handleOpen();
           setTextInput("");
         }
-        finally{
-          setValidating(false);
-        }
-      
-     }
-
-
+      } finally {
+        setValidating(false);
+      }
+    }
   };
+  
   return (
     <div className="relative min-h-screen bg-custom-background">
       {/* Company Header - Fixed Position */}
