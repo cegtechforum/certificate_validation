@@ -86,7 +86,7 @@ const User = () => {
         if (uniqueId) {
           const success = await fetchCertificateDetails(uniqueId);
           if (success) {
-            toast.success(`Certificate Validated Successfully`, {
+            toast.success(`Valid Certificate`, {
               className: "toast-success-custom",
               bodyClassName: "custom-toast-body",
               progressClassName: "custom-progress-bar",
@@ -148,7 +148,7 @@ const User = () => {
         if (success) {
           // Use setTimeout to ensure state updates have propagated
           setTimeout(() => {
-            toast.success(`Certificate Validated Successfully`, {
+            toast.success(`Valid Certificate`, {
               className: "toast-success-custom",
               bodyClassName: "custom-toast-body",
               progressClassName: "custom-progress-bar",
@@ -188,7 +188,7 @@ const User = () => {
 
         const success = await fetchCertificateDetails(data);
         if (success) {
-          toast.success(`Certificate Validated Successfully`, {
+          toast.success(`Valid Certificate`, {
             className: "toast-success-custom",
             bodyClassName: "custom-toast-body",
             progressClassName: "custom-progress-bar",

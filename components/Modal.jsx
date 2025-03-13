@@ -35,7 +35,7 @@ const CustomModal = ({ open, handleClose, fetchData}) => {
 
             <div className="text-center mb-4 sm:mb-8">
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
-                Certificate Validated
+                Certificate Validation Details
               </h2>
               <p className="text-sm sm:text-base text-zinc-400 mt-2 break-all">
                 Unique ID: {data.unique_id}
