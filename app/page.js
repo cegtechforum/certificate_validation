@@ -314,6 +314,11 @@ const User = () => {
               className="w-full sm:flex-1 h-12 px-4 rounded-md border-2 bg-slate-950 border-zinc-600 focus:border-emerald-500 focus:outline-none text-slate-100 placeholder-slate-400"
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !validating) {
+                  handleValidate();
+                }
+              }}
               disabled={validating}
             />
             <button
