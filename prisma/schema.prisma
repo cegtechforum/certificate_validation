@@ -24,8 +24,6 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@unique([email], name: "unique_email")
 }
 
 model Admin {
