@@ -56,12 +56,12 @@ const CustomModal = ({ open, handleClose, fetchData}) => {
                   label: "Email",
                   value: data.email,
                 },
-                {
-                  icon: Phone,
-                  color: "text-teal-500",
-                  label: "Mobile",
-                  value: data.mobile,
-                },
+                // {
+                //   icon: Phone,
+                //   color: "text-teal-500",
+                //   label: "Mobile",
+                //   value: data.mobile,
+                // },
                 {
                   icon: Flag,
                   color: "text-purple-500",
